@@ -1,6 +1,10 @@
--- Configure this to be the threshold to trigger output
+-- Configure this to be the threshold to enable output
 -- Valid options: 0-1
-local threshold = 0.99
+local lowThreshold = 0.90
+
+-- Configure this to be the threshold to disable output
+-- Valid options: 0-1
+local highThreshold = 0.99
 
 -- Configure this to be the output side that redstone signal will be sent to
 -- Valid options: top, bottom, left, right, front, back
@@ -12,8 +16,12 @@ local checkSleepTime = 1
 
 -- Validate inputs
 
-if threshold < 0 or threshold > 1 then
-    error("Threshold is out of logical range (expected 0-1, got" .. threshold .. ").")
+if lowThreshold < 0 or lowThreshold > 1 then
+    error("Low threshold is out of logical range (expected 0-1, got" .. lowThreshold .. ").")
+end
+
+if highThreshold < 0 or highThreshold > 1 then
+    error("High threshold is out of logical range (expected 0-1, got" .. highThreshold .. ").")
 end
 
 function table.contains(table, element)
@@ -67,9 +75,11 @@ local state = lastState
 while true do
     lastState = state
     local percentage = ec.getEnergyFilledPercentage()
-    if percentage <= threshold then
+    if not lastState and percentage <= lowThreshold then
+        -- If the previous state was off and we go below the low threshold
         state = true
-    else
+    elseif lastState and percentage >= highThreshold then
+        -- If the previous state was on and we go above the high threshold
         state = false
     end
 
