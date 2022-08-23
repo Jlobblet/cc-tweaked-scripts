@@ -74,7 +74,8 @@ while true do
     end
 
     if state ~= lastState then
-        print("State changed from " .. tostring(lastState) .. " to " .. tostring(state) .. ".")
+        local time = textutils.formatTime(os.time("local"), true)
+        print("State changed from " .. tostring(lastState) .. " to " .. tostring(state) .. " at " .. time .. ".")
         redstone.setOutput(outputSide, state)
     end
     sleep(checkSleepTime)
